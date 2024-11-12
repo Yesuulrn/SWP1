@@ -1,0 +1,116 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+
+struct Node {
+    int key;
+    Node* left;
+    Node* right;
+
+    Node(int k) : key(k), left(nullptr), right(nullptr) {}
+};
+
+
+Node* insertBST(Node* root, int key) {
+    if (root == nullptr) {
+        return new Node(key);
+    }
+
+    if (key < root->key) {
+        root->left = insertBST(root->left, key);
+    } else if (key > root->key) {
+        root->right = insertBST(root->right, key);
+    } else {
+        
+        cerr << "i " << key << ": The key already exists" << endl;
+    }
+    return root;
+}
+
+
+Node* minNode(Node* root) {
+    while (root && root->left != nullptr) {
+        root = root->left;
+    }
+    return root;
+}
+
+
+Node* eraseBST(Node* root, int key) {
+    if (root == nullptr) {
+        cerr << "d " << key << ": The key does not exist" << endl;
+        return root;
+    }
+
+    if (key < root->key) {
+        root->left = eraseBST(root->left, key);
+    } else if (key > root->key) {
+        root->right = eraseBST(root->right, key);
+    } else {
+        
+        if (root->left == nullptr) {
+            Node* temp = root->right;
+            delete root;
+            return temp;
+        } else if (root->right == nullptr) {
+            Node* temp = root->left;
+            delete root;
+            return temp;
+        }
+
+        
+        Node* temp = minNode(root->right);
+        root->key = temp->key;
+        root->right = eraseBST(root->right, temp->key);
+    }
+    return root;
+}
+
+
+void inorder(Node* root) {
+    if (root == nullptr) {
+        cout << "<>";
+        return;
+    }
+    cout << "<";
+    inorder(root->left);
+    if (root->left) cout << " ";
+    cout << root->key;
+    if (root->right) cout << " ";
+    inorder(root->right);
+    cout << ">";
+}
+
+
+void clear(Node*& root) {
+    if (root == nullptr) return;
+    clear(root->left);
+    clear(root->right);
+    delete root;
+    root = nullptr;
+}
+
+int main() {
+    Node* root = nullptr;
+    string command;
+    while (cin >> command) {
+        if (command == "i") {
+            int key;
+            cin >> key;
+            root = insertBST(root, key);
+            inorder(root);
+            cout << endl;
+        } else if (command == "d") {
+            int key;
+            cin >> key;
+            root = eraseBST(root, key);
+            inorder(root);
+            cout << endl;
+        }
+    }
+
+    
+    clear(root);
+    return 0;
+}
